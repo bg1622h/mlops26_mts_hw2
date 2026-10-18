@@ -1,4 +1,4 @@
-CREATE TABLE hw2.transactions_optimized
+CREATE TABLE IF NOT EXISTS hw2.transactions_optimized
 (
     transaction_id String,
     transaction_time DateTime,
@@ -10,7 +10,7 @@ CREATE TABLE hw2.transactions_optimized
 ENGINE = MergeTree
 ORDER BY (state, category, transaction_time);
 
-CREATE TABLE hw2.transactions_state_max
+CREATE TABLE IF NOT EXISTS hw2.transactions_state_max
 (
     state LowCardinality(String),
     category_state AggregateFunction(argMax, String, Float64),
@@ -19,7 +19,7 @@ CREATE TABLE hw2.transactions_state_max
 ENGINE = AggregatingMergeTree
 ORDER BY state;
 
-CREATE MATERIALIZED VIEW hw2.transactions_optimized_mv
+CREATE MATERIALIZED VIEW IF NOT EXISTS hw2.transactions_optimized_mv
 TO hw2.transactions_optimized
 AS SELECT
     transaction_id,
@@ -30,7 +30,7 @@ AS SELECT
     is_fraud
 FROM hw2.transactions;
 
-CREATE MATERIALIZED VIEW hw2.transactions_state_max_mv
+CREATE MATERIALIZED VIEW IF NOT EXISTS hw2.transactions_state_max_mv
 TO hw2.transactions_state_max
 AS SELECT
     state,
@@ -57,7 +57,7 @@ SELECT
 FROM hw2.transactions
 GROUP BY state;
 
-CREATE VIEW hw2.max_transactions_by_state AS
+CREATE VIEW IF NOT EXISTS hw2.max_transactions_by_state AS
 SELECT
     state,
     argMaxMerge(category_state) AS category_of_largest_transaction,
